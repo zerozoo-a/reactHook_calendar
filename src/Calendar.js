@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-//1. components 외부에서 date 값을 주고 이를 지속적으로 참조하는게 가능한가? :
-//2. 외부에서 date값 참조해 변경하면 변경은 되지만 화면이 render되지 않음
-//3. render시키기 위해 필요없는 값 setState해보기 || useEffect로 date구독하기 사용하기
 const months = [
   "January",
   "February",
@@ -22,12 +19,48 @@ const months = [
   "November",
   "December",
 ];
+const CalendarStyle = styled.div`
+  list-style: none;
+`;
 const Day = ["Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"];
+const DayStyle = styled.ul`
+  display: flex;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  justify-content: center;
+  & li {
+    width: calc(15rem / 7);
+  }
+`;
+const CalendarTopStyle = styled.div`
+  margin: 0 auto;
+  text-align: center;
+`;
+const Days = styled.ul`
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: 15rem;
+  font-size: 0.5em;
+  height: 19em;
+  outline: 1px solid red;
+  list-style: none;
+  & li {
+    display: flex;
+    width: calc(15rem / 7);
+    align-items: center;
+    justify-content: center;
+  }
+`;
 
 const date = new Date();
 date.setDate(1);
 const Calendar = () => {
   const [render, setRender] = useState(date);
+  const year = date.getFullYear();
+  const month = date.getMonth();
   const lastDate = new Date(
     date.getFullYear(),
     date.getMonth() + 1,
@@ -39,20 +72,40 @@ const Calendar = () => {
     0
   ).getDate();
   return (
-    <div>
-      <div>{date.getMonth()}</div>
-      <div>
-        {/* {new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()} */}
-        {lastDate}
-      </div>
-      <div>{prevLastDate}</div>
+    <CalendarStyle>
+      <div>이 달의 마지막 날짜 / {lastDate}</div>
+      <div>이전달의 마지막 날짜 / {prevLastDate}</div>
       <button
         onClick={() => {
           setRender(date.setMonth(date.getMonth() + 1));
         }}>
         UP
       </button>
-    </div>
+      <button
+        onClick={() => {
+          setRender(date.setMonth(date.getMonth() - 1));
+        }}>
+        DOWN
+      </button>
+      <CalendarTopStyle>
+        <div>
+          📆{year}/{months[month]}
+        </div>
+        <div>
+          <DayStyle>
+            {Day.map((v, i) => (
+              <li>{v}</li>
+            ))}
+          </DayStyle>
+        </div>
+
+        <Days>
+          {[...Array(lastDate)].map((v, i) => (
+            <li>{i + 1}</li>
+          ))}
+        </Days>
+      </CalendarTopStyle>
+    </CalendarStyle>
   );
 };
 
