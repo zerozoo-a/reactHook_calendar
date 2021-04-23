@@ -66,15 +66,20 @@ const Calendar = () => {
     date.getMonth() + 1,
     0
   ).getDate();
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDay();
   const prevLastDate = new Date(
     date.getFullYear(),
     date.getMonth(),
     0
   ).getDate();
+  const prevLastDay =
+    new Date(date.getFullYear(), date.getMonth(), 0).getDay() + 1;
+  //0 ~ 6
   return (
     <CalendarStyle>
       <div>이 달의 마지막 날짜 / {lastDate}</div>
       <div>이전달의 마지막 날짜 / {prevLastDate}</div>
+      <div>이전달의 마지막 요일{prevLastDay}</div>
       <button
         onClick={() => {
           setRender(date.setMonth(date.getMonth() + 1));
@@ -98,9 +103,18 @@ const Calendar = () => {
             ))}
           </DayStyle>
         </div>
+        <div>
+          {prevLastDate}/{prevLastDay}
+        </div>
 
         <Days>
+          {[...Array(prevLastDay === 7 ? 0 : prevLastDay)].map((v, i) => (
+            <li>{prevLastDate - prevLastDay + i + 1}</li>
+          ))}
           {[...Array(lastDate)].map((v, i) => (
+            <li>{i + 1}</li>
+          ))}
+          {[...Array(7 - lastDay - 1)].map((v, i) => (
             <li>{i + 1}</li>
           ))}
         </Days>
