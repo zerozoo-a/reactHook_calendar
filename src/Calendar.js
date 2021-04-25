@@ -21,44 +21,77 @@ const months = [
 ];
 const CalendarStyle = styled.div`
   list-style: none;
+  & * {
+    font-size: 1rem;
+  }
 `;
 const Day = ["Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"];
 const DayStyle = styled.ul`
   display: flex;
-  margin: 0 auto;
   padding: 0;
   list-style: none;
   justify-content: center;
   & li {
-    width: calc(15rem / 7);
+    width: calc(16.7rem / 7);
+    margin: 0.1rem;
+    padding: 0;
+    text-align: center;
   }
 `;
 const CalendarTopStyle = styled.div`
-  margin: 0 auto;
-  text-align: center;
+  display: flex;
+  justify-content: space-around;
+
+  & .calendarTitle {
+    width: 4rem;
+    text-align: center;
+  }
 `;
 const Days = styled.ul`
   margin: 0 auto;
   padding: 0;
   display: flex;
+  width: 18.1rem;
   flex-wrap: wrap;
-  width: 15rem;
   font-size: 0.5em;
-  height: 19em;
-  outline: 1px solid red;
+  height: 19.8em;
   list-style: none;
+
+  & li:hover {
+    border: 1px solid rgb(0, 138, 245);
+    color: rgb(0, 138, 245);
+  }
   & li {
+    margin: 0.1rem;
     display: flex;
-    width: calc(15rem / 7);
+    box-sizing: border-box;
+    width: calc(16.7rem / 7);
+    height: calc(10.1rem / 6);
     align-items: center;
     justify-content: center;
   }
+  & .prevDays {
+    color: rgb(168, 176, 188);
+  }
+  & .today {
+    color: ghostwhite;
+    background-color: rgb(0, 138, 245);
+    border-radius: 0.2rem;
+  }
+  & .nextDays {
+    color: rgb(168, 176, 188);
+  }
+  & .clicked {
+    background-color: rgb(83, 153, 233);
+  }
 `;
-
+//change the color of the previous and next days
 const date = new Date();
 date.setDate(1);
 const Calendar = () => {
   const [render, setRender] = useState(date);
+  const [today, setToday] = useState(new Date().getDate());
+  const [isClicked, setIsClicked] = useState(false);
   const year = date.getFullYear();
   const month = date.getMonth();
   const lastDate = new Date(
@@ -74,51 +107,53 @@ const Calendar = () => {
   ).getDate();
   const prevLastDay =
     new Date(date.getFullYear(), date.getMonth(), 0).getDay() + 1;
-  //0 ~ 6
+
   return (
     <CalendarStyle>
-      <div>이 달의 마지막 날짜 / {lastDate}</div>
-      <div>이전달의 마지막 날짜 / {prevLastDate}</div>
-      <div>이전달의 마지막 요일{prevLastDay}</div>
-      <button
-        onClick={() => {
-          setRender(date.setMonth(date.getMonth() + 1));
-        }}>
-        UP
-      </button>
-      <button
-        onClick={() => {
-          setRender(date.setMonth(date.getMonth() - 1));
-        }}>
-        DOWN
-      </button>
       <CalendarTopStyle>
-        <div>
-          📆{year}/{months[month]}
+        <FontAwesomeIcon
+          icon={faChevronLeft}
+          onClick={() => {
+            setRender(date.setMonth(date.getMonth() - 1));
+          }}></FontAwesomeIcon>
+        <div className="calendarTitle">
+          {year}/{months[month]}
         </div>
-        <div>
-          <DayStyle>
-            {Day.map((v, i) => (
-              <li>{v}</li>
-            ))}
-          </DayStyle>
-        </div>
-        <div>
-          {prevLastDate}/{prevLastDay}
-        </div>
-
-        <Days>
-          {[...Array(prevLastDay === 7 ? 0 : prevLastDay)].map((v, i) => (
-            <li>{prevLastDate - prevLastDay + i + 1}</li>
-          ))}
-          {[...Array(lastDate)].map((v, i) => (
-            <li>{i + 1}</li>
-          ))}
-          {[...Array(7 - lastDay - 1)].map((v, i) => (
-            <li>{i + 1}</li>
-          ))}
-        </Days>
+        <FontAwesomeIcon
+          icon={faChevronRight}
+          onClick={() => {
+            setRender(date.setMonth(date.getMonth() + 1));
+          }}></FontAwesomeIcon>
       </CalendarTopStyle>
+      <div>
+        <DayStyle>
+          {Day.map((v, i) => (
+            <li>{v}</li>
+          ))}
+        </DayStyle>
+      </div>
+
+      <Days>
+        {[...Array(prevLastDay === 7 ? 0 : prevLastDay)].map((v, i) => (
+          <li className="prevDays">
+            <div>{prevLastDate - prevLastDay + i + 1}</div>
+          </li>
+        ))}
+        {[...Array(lastDate)].map((v, i) => (
+          <div>
+            <div>
+              <li className={i + 1 === today ? "today" : "anotherDay"}>
+                {i + 1}
+              </li>
+            </div>
+          </div>
+        ))}
+        {[...Array(7 - lastDay - 1)].map((v, i) => (
+          <li className="nextDays">
+            <div>{i + 1}</div>
+          </li>
+        ))}
+      </Days>
     </CalendarStyle>
   );
 };

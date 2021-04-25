@@ -12,7 +12,6 @@ body{
 const App = () => {
   return (
     <>
-      <div>this project will be giphyCalendar</div>
       <Calendar />
     </>
   );
