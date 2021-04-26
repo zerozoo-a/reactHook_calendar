@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { createGlobalStyle } from "styled-components";
 import {
@@ -59,7 +59,7 @@ const Days = styled.ul`
 
   & li:hover {
     border: 1px solid rgb(0, 138, 245);
-    color: rgb(0, 138, 245);
+    color: black;
   }
   & li {
     margin: 0.1rem;
@@ -69,6 +69,7 @@ const Days = styled.ul`
     height: calc(10.1rem / 6);
     align-items: center;
     justify-content: center;
+    cursor: pointer;
   }
   & .prevDays {
     color: rgb(168, 176, 188);
@@ -81,7 +82,7 @@ const Days = styled.ul`
   & .nextDays {
     color: rgb(168, 176, 188);
   }
-  & .clicked {
+  & .clickedDay {
     background-color: rgb(83, 153, 233);
   }
 `;
@@ -89,9 +90,11 @@ const Days = styled.ul`
 const date = new Date();
 date.setDate(1);
 const Calendar = () => {
+  const [isClicked, setIsClicked] = useState(false);
+  const [iter, setIter] = useState(null);
+  const [iterReserve, setIterReserve] = useState([]);
   const [render, setRender] = useState(date);
   const [today, setToday] = useState(new Date().getDate());
-  const [isClicked, setIsClicked] = useState(false);
   const year = date.getFullYear();
   const month = date.getMonth();
   const lastDate = new Date(
@@ -107,7 +110,49 @@ const Calendar = () => {
   ).getDate();
   const prevLastDay =
     new Date(date.getFullYear(), date.getMonth(), 0).getDay() + 1;
+  //refs
+  const refs = useRef([]);
+  refs.current = [];
+  const addToRefs = (el) => {
+    if (el && !refs.current.includes(el)) {
+      refs.current.push(el);
+    }
+  };
 
+  const clickedHandler = (i) => {
+    setIsClicked(!isClicked);
+    setIter(i);
+  };
+  useEffect(() => {
+    console.log(iterReserve);
+    if (iterReserve.length > 9) {
+      refs.current[iter].style.color = "black";
+      refs.current[iter].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+      refs.current[iter].style.borderRadius = "0.2rem";
+      for (const el of iterReserve) {
+        if (el > 0) {
+          // refs.current[el].style.color = "black";
+          // refs.current[el].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+          // refs.current[el].style.borderRadius = "0.2rem";
+        }
+      }
+      alert("선택 가능한 날짜는 최대 10 일입니다.");
+    }
+    if (iter === null) {
+      return;
+    } else if (!iterReserve.includes(iter)) {
+      setIterReserve([...iterReserve, iter]);
+      refs.current[iter].style.color = "#FFFFFF";
+      refs.current[iter].style.backgroundColor = "#FF5A60";
+      refs.current[iter].style.borderRadius = "0.2rem";
+    } else if (iterReserve.includes(iter)) {
+      setIterReserve(iterReserve.filter((num) => num !== iter));
+      refs.current[iter].style.color = "black";
+      refs.current[iter].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+      refs.current[iter].style.borderRadius = "0.2rem";
+    }
+    // refs.current[iter].style.color = "red";
+  }, [isClicked]);
   return (
     <CalendarStyle>
       <CalendarTopStyle>
@@ -135,18 +180,18 @@ const Calendar = () => {
 
       <Days>
         {[...Array(prevLastDay === 7 ? 0 : prevLastDay)].map((v, i) => (
-          <li className="prevDays">
+          <li key={i} className="prevDays">
             <div>{prevLastDate - prevLastDay + i + 1}</div>
           </li>
         ))}
         {[...Array(lastDate)].map((v, i) => (
-          <div>
-            <div>
-              <li className={i + 1 === today ? "today" : "anotherDay"}>
-                {i + 1}
-              </li>
-            </div>
-          </div>
+          <li
+            key={i}
+            ref={addToRefs}
+            onClick={() => clickedHandler(i)}
+            className={i + 1 === today ? "today" : "anotherDay"}>
+            {i + 1}
+          </li>
         ))}
         {[...Array(7 - lastDay - 1)].map((v, i) => (
           <li className="nextDays">
