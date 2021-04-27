@@ -43,7 +43,7 @@ const CalendarTopStyle = styled.div`
   justify-content: space-around;
 
   & .calendarTitle {
-    width: 4rem;
+    display: flex;
     text-align: center;
   }
 `;
@@ -74,11 +74,7 @@ const Days = styled.ul`
   & .prevDays {
     color: rgb(168, 176, 188);
   }
-  & .today {
-    color: ghostwhite;
-    background-color: rgb(0, 138, 245);
-    border-radius: 0.2rem;
-  }
+
   & .nextDays {
     color: rgb(168, 176, 188);
   }
@@ -90,11 +86,6 @@ const Days = styled.ul`
 const date = new Date();
 date.setDate(1);
 const Calendar = () => {
-  const [isClicked, setIsClicked] = useState(false);
-  const [iter, setIter] = useState(null);
-  const [iterReserve, setIterReserve] = useState([]);
-  const [render, setRender] = useState(date);
-  const [today, setToday] = useState(new Date().getDate());
   const year = date.getFullYear();
   const month = date.getMonth();
   const lastDate = new Date(
@@ -110,22 +101,54 @@ const Calendar = () => {
   ).getDate();
   const prevLastDay =
     new Date(date.getFullYear(), date.getMonth(), 0).getDay() + 1;
+  const [isClicked, setIsClicked] = useState(false);
+  const [iter, setIter] = useState(null);
+  const [iterReserve, setIterReserve] = useState([]); //month
+  const [janIterReserve, setJanIterReserve] = useState([]);
+  const [febIterReserve, setFebIterReserve] = useState([]);
+  const [marIterReserve, setMarIterReserve] = useState([]);
+  const [aprIterReserve, setAprIterReserve] = useState([]);
+  const [mayIterReserve, setMayIterReserve] = useState([]);
+  const [junIterReserve, setJunIterReserve] = useState([]);
+  const [julIterReserve, setJulIterReserve] = useState([]);
+  const [augIterReserve, setAugIterReserve] = useState([]);
+  const [sepIterReserve, setSepIterReserve] = useState([]);
+  const [octIterReserve, setOctIterReserve] = useState([]);
+  const [novIterReserve, setNovIterReserve] = useState([]);
+  const [decIterReserve, setDecIterReserve] = useState([]);
+  const [render, setRender] = useState(date);
+  const [today, setToday] = useState(new Date().getDate());
   //refs
-  const refs = useRef([]);
-  refs.current = [];
+  const refs = useRef([]); //여러 refs를 지정 할 것이다.
+  refs.current = []; // refs가 여러가지이면 refs.current는 refs를 담는 그릇이므로 여러가지여야 한다.
   const addToRefs = (el) => {
     if (el && !refs.current.includes(el)) {
       refs.current.push(el);
     }
-  };
+  }; //refs.current.push는 순서대로 ref값을 refs.current 배열에 담는다
+  //refs setting
 
   const clickedHandler = (i) => {
     setIsClicked(!isClicked);
     setIter(i);
   };
-  useEffect(() => {
-    console.log(iterReserve);
-    if (iterReserve.length > 9) {
+  const selectorDraw = (selectedIterReserve, setSelectedIterReserve, mon) => {
+    if (iter === null) {
+      return;
+    } else if (!selectedIterReserve.includes(iter) && month === mon) {
+      setSelectedIterReserve([...selectedIterReserve, iter]);
+      refs.current[iter].style.color = "#FFFFFF";
+      refs.current[iter].style.backgroundColor = "#FF5A60";
+      refs.current[iter].style.borderRadius = "0.2rem";
+    } else if (selectedIterReserve.includes(iter) && month === mon) {
+      setSelectedIterReserve(selectedIterReserve.filter((num) => num !== iter));
+      refs.current[iter].style.color = "black";
+      refs.current[iter].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+      refs.current[iter].style.borderRadius = "0.2rem";
+    }
+  };
+  const selectedCounter = (selectedIterReserve) => {
+    if (selectedIterReserve.length > 10) {
       refs.current[iter].style.color = "black";
       refs.current[iter].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
       refs.current[iter].style.borderRadius = "0.2rem";
@@ -138,21 +161,129 @@ const Calendar = () => {
       }
       alert("선택 가능한 날짜는 최대 10 일입니다.");
     }
-    if (iter === null) {
-      return;
-    } else if (!iterReserve.includes(iter)) {
-      setIterReserve([...iterReserve, iter]);
-      refs.current[iter].style.color = "#FFFFFF";
-      refs.current[iter].style.backgroundColor = "#FF5A60";
-      refs.current[iter].style.borderRadius = "0.2rem";
-    } else if (iterReserve.includes(iter)) {
-      setIterReserve(iterReserve.filter((num) => num !== iter));
-      refs.current[iter].style.color = "black";
-      refs.current[iter].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
-      refs.current[iter].style.borderRadius = "0.2rem";
+  };
+  const selectedRedraw = (selectedIterReserve, mon, chk) => {
+    console.log(selectedIterReserve);
+    if (month === mon) {
+      selectedIterReserve.map((v, i) => {
+        refs.current[v].style.color = "#FFFFFF";
+        refs.current[v].style.backgroundColor = "#FF5A60";
+        refs.current[v].style.borderRadius = "0.2rem";
+      });
     }
-    // refs.current[iter].style.color = "red";
-  }, [isClicked]);
+  };
+  useEffect(() => {
+    refs.current.map((v) => {
+      v.style.color = "black";
+      v.style.backgroundColor = "rgba(0,0,0,0.0)";
+      v.style.borderRadius = "0.2rem";
+    });
+  }, [month]);
+
+  useEffect(() => {
+    selectedCounter(janIterReserve);
+    selectorDraw(janIterReserve, setJanIterReserve, 0);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(janIterReserve, 0);
+  }, [month]); //redraw when came back origin month
+  useEffect(() => {
+    selectedCounter(febIterReserve);
+    selectorDraw(febIterReserve, setFebIterReserve, 1);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(febIterReserve, 1);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(marIterReserve);
+    selectorDraw(marIterReserve, setMarIterReserve, 2);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(marIterReserve, 2);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(aprIterReserve);
+    selectorDraw(aprIterReserve, setAprIterReserve, 3);
+  }, [isClicked]); //APR draw selected days in calender
+  useEffect(() => {
+    selectedRedraw(aprIterReserve, 3, "apr");
+  }, [month]); //APR redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(mayIterReserve);
+    selectorDraw(mayIterReserve, setMayIterReserve, 4);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(mayIterReserve, 4);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(junIterReserve);
+    selectorDraw(junIterReserve, setJunIterReserve, 5);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(junIterReserve, 5);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(julIterReserve);
+    selectorDraw(julIterReserve, setJulIterReserve, 6);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(julIterReserve, 6);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(augIterReserve);
+    selectorDraw(augIterReserve, setAugIterReserve, 7);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(augIterReserve, 7);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(sepIterReserve);
+    selectorDraw(sepIterReserve, setSepIterReserve, 8);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(sepIterReserve, 8);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(octIterReserve);
+    selectorDraw(octIterReserve, setOctIterReserve, 9);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(octIterReserve, 9);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(novIterReserve);
+    selectorDraw(novIterReserve, setNovIterReserve, 10);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(novIterReserve, 10);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    selectedCounter(decIterReserve);
+    selectorDraw(decIterReserve, setDecIterReserve, 11);
+  }, [isClicked]); //JAN draw
+  useEffect(() => {
+    selectedRedraw(decIterReserve, 11);
+  }, [month]); //redraw when came back origin month
+
+  useEffect(() => {
+    if (month === new Date().getMonth()) {
+      // console.log("draw today");
+      refs.current[today - 1].style.color = "white";
+      refs.current[today - 1].style.backgroundColor = "rgb(0,138,245)";
+      refs.current[today - 1].style.borderRadius = "0.2rem";
+    }
+  }, [month]);
+  //draw today
   return (
     <CalendarStyle>
       <CalendarTopStyle>
@@ -162,7 +293,7 @@ const Calendar = () => {
             setRender(date.setMonth(date.getMonth() - 1));
           }}></FontAwesomeIcon>
         <div className="calendarTitle">
-          {year}/{months[month]}
+          {year} {months[month]} {today}
         </div>
         <FontAwesomeIcon
           icon={faChevronRight}
@@ -185,11 +316,7 @@ const Calendar = () => {
           </li>
         ))}
         {[...Array(lastDate)].map((v, i) => (
-          <li
-            key={i}
-            ref={addToRefs}
-            onClick={() => clickedHandler(i)}
-            className={i + 1 === today ? "today" : "anotherDay"}>
+          <li key={i} ref={addToRefs} onClick={() => clickedHandler(i)}>
             {i + 1}
           </li>
         ))}
